@@ -1,0 +1,42 @@
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", "Arial Rounded MT Bold", sans-serif;
+  background: linear-gradient(to bottom, #fff7f3, #fff0f6);
+}
+
+nav {
+  background: #ff8fb1;
+  padding: 18px 28px;
+  border-radius: 0 0 22px 22px;
+  box-shadow: 0 6px 16px rgba(255, 143, 177, 0.25);
+}
+
+nav a {
+  color: white;
+  margin-right: 26px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 22px;
+  transition: 0.2s ease;
+}
+
+nav a:hover {
+  color: #fff3b0;
+}
+
+.page {
+  padding: 50px;
+}
+
+.card {
+  background: white;
+  padding: 24px;
+  margin: 18px 0;
+  border-radius: 22px;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.07);
+  transition: 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
