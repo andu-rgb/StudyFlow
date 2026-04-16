@@ -11,7 +11,10 @@ function Stats() {
   const [habits, setHabits] = useState<Habit[]>([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/api/habits").then((res) => setHabits(res.data));
+    const token = localStorage.getItem("token");
+    axios.get("http://localhost:3001/api/habits", {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => setHabits(res.data));
   }, []);
 
   const totalHabits = habits.length;
