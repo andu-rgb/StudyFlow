@@ -47,7 +47,7 @@ function Dashboard() {
   return (
     <div className="page">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>❀˖ ° My Study Tasks</h1>
+        <h1> My Study Tasks</h1>
       </div>
 
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
@@ -62,13 +62,13 @@ function Dashboard() {
           onClick={addHabit}
           style={{ background: "linear-gradient(to right, #f472b6, #fb923c)", color: "white", border: "none", borderRadius: "20px", padding: "10px 20px", cursor: "pointer", fontWeight: "bold", fontSize: "16px" }}
         >
-          Add Task ✨
+          Add Task
         </button>
       </div>
 
       {habits.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: "40px" }}>
-          <p style={{ fontSize: "20px" }}><strong>No study tasks yet 📖</strong></p>
+          <p style={{ fontSize: "20px" }}><strong>No study tasks yet...</strong></p>
           <p style={{ color: "#9ca3af" }}>Add your first task above!</p>
         </div>
       ) : (

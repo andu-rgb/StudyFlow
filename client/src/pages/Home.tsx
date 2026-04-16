@@ -103,7 +103,7 @@ function Home() {
                   cursor: "pointer",
                 }}
               >
-                View Stats ✨
+                View Stats
               </button>
             </Link>
           </div>

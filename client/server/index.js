@@ -4,16 +4,10 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const session = require("express-session");
 
 const app = express();
 app.use(cors({ origin: ["http://localhost:5173", "http://localhost:5174"], credentials: true }));
 app.use(express.json());
-app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -24,7 +18,6 @@ mongoose.connect(process.env.MONGO_URI)
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, sparse: true },
   password: String,
-  googleId: { type: String, unique: true, sparse: true },
   name: String,
 });
 const User = mongoose.model("User", userSchema);
@@ -48,35 +41,6 @@ const authMiddleware = (req, res, next) => {
     res.status(401).json({ message: "Invalid token" });
   }
 };
-
-// ── Google OAuth ─────────────────────────────────────────
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "/auth/google/callback",
-}, async (accessToken, refreshToken, profile, done) => {
-  let user = await User.findOne({ googleId: profile.id });
-  if (!user) {
-    user = await User.create({
-      googleId: profile.id,
-      email: profile.emails[0].value,
-      name: profile.displayName,
-    });
-  }
-  done(null, user);
-}));
-
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser(async (id, done) => done(null, await User.findById(id)));
-
-app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-app.get("/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "http://localhost:5174/login" }),
-  (req, res) => {
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    res.redirect(`http://localhost:5174/auth-success?token=${token}`);
-  }
-);
 
 // ── Email/Password Auth Routes ───────────────────────────
 app.post("/api/auth/register", async (req, res) => {
@@ -125,4 +89,4 @@ app.delete("/api/habits/:id", authMiddleware, async (req, res) => {
   res.json({ message: "Deleted" });
 });
 
-app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
+app.listen(process.env.PORT || 3001, () => console.log(`Server running on port ${process.env.PORT || 3001}`));
