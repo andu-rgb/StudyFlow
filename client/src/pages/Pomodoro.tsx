@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
+type Mode = "focus" | "short" | "long";
+
 const LABELS = {
   focus: "Focus Session",
   short: "Short Break",
@@ -8,40 +10,57 @@ const LABELS = {
 
 const CIRC = 2 * Math.PI * 95;
 
-export default function Pomodoro({ darkMode }: { darkMode: boolean }) {
-  const [focusTime, setFocusTime] = useState(() => {
-    return Number(localStorage.getItem("focusTime")) || 25;
-  });
+function formatTime(totalSeconds: number) {
+  const mins = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+  const secs = String(totalSeconds % 60).padStart(2, "0");
+  return `${mins}:${secs}`;
+}
 
-  const [shortTime, setShortTime] = useState(() => {
-    return Number(localStorage.getItem("shortTime")) || 5;
-  });
+function formatCard(totalSeconds: number) {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
 
-  const [longTime, setLongTime] = useState(() => {
-    return Number(localStorage.getItem("longTime")) || 15;
-  });
+  if (mins > 0 && secs > 0) return `${mins}m ${secs}s`;
+  if (mins > 0) return `${mins}m`;
+  return `${secs}s`;
+}
 
-  const [sessionsGoal, setSessionsGoal] = useState(() => {
-    return Number(localStorage.getItem("sessionsGoal")) || 4;
-  });
+export default function Pomodoro({
+  darkMode,
+}: {
+  darkMode: boolean;
+}) {
+  // 🔥 Persistent settings (seconds)
+  const [focusTime, setFocusTime] = useState(
+    () => Number(localStorage.getItem("focusTime")) || 1500
+  ); // 25m
+
+  const [shortTime, setShortTime] = useState(
+    () => Number(localStorage.getItem("shortTime")) || 300
+  ); // 5m
+
+  const [longTime, setLongTime] = useState(
+    () => Number(localStorage.getItem("longTime")) || 900
+  ); // 15m
+
+  const [sessionsGoal, setSessionsGoal] = useState(
+    () => Number(localStorage.getItem("sessionsGoal")) || 4
+  );
 
   const MODES = {
-    focus: focusTime * 60,
-    short: shortTime * 60,
-    long: longTime * 60,
+    focus: focusTime,
+    short: shortTime,
+    long: longTime,
   };
 
-  const [mode, setModeState] = useState<"focus" | "short" | "long">("focus");
+  const [mode, setMode] = useState<Mode>("focus");
   const [remaining, setRemaining] = useState(MODES.focus);
   const [running, setRunning] = useState(false);
-  const [session, setSession] = useState(1);
-  const [completedSessions, setCompleted] = useState(0);
-  const [statusText, setStatusText] = useState("Ready to focus?");
+  const [completed, setCompleted] = useState(0);
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const total = MODES[mode];
-
-  // Save settings permanently
+  // Save settings
   useEffect(() => {
     localStorage.setItem("focusTime", String(focusTime));
     localStorage.setItem("shortTime", String(shortTime));
@@ -49,66 +68,112 @@ export default function Pomodoro({ darkMode }: { darkMode: boolean }) {
     localStorage.setItem("sessionsGoal", String(sessionsGoal));
   }, [focusTime, shortTime, longTime, sessionsGoal]);
 
-  const switchMode = (m: "focus" | "short" | "long") => {
+  const total = MODES[mode];
+
+  const switchMode = (newMode: Mode) => {
     if (timerRef.current) clearInterval(timerRef.current);
     setRunning(false);
-    setModeState(m);
-    setRemaining(MODES[m]);
-    setStatusText(m === "focus" ? "Ready to focus?" : "Time to recharge!");
+    setMode(newMode);
+    setRemaining(MODES[newMode]);
   };
 
-  const handleComplete = () => {
+  const nextMode = () => {
     if (mode === "focus") {
-      setCompleted((c) => {
-        const next = c + 1;
+      const nextCompleted = completed + 1;
+      setCompleted(nextCompleted);
 
-        if (next % sessionsGoal === 0) {
-          setSession(1);
-          setTimeout(() => switchMode("long"), 300);
-        } else {
-          setSession((s) => Math.min(s + 1, sessionsGoal));
-          setTimeout(() => switchMode("short"), 300);
-        }
-
-        return next;
-      });
+      if (nextCompleted % sessionsGoal === 0) {
+        switchMode("long");
+      } else {
+        switchMode("short");
+      }
     } else {
-      setTimeout(() => switchMode("focus"), 300);
+      switchMode("focus");
     }
   };
 
+  // Timer logic
   useEffect(() => {
-    if (running) {
-      timerRef.current = setInterval(() => {
-        setRemaining((r) => {
-          if (r <= 1) {
-            if (timerRef.current) clearInterval(timerRef.current);
-            setRunning(false);
-            handleComplete();
-            return 0;
-          }
-          return r - 1;
-        });
-      }, 1000);
-    }
+    if (!running) return;
+
+    timerRef.current = setInterval(() => {
+      setRemaining((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          setRunning(false);
+          nextMode();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [running, mode]);
+  }, [running, mode, completed]);
 
-  const mins = String(Math.floor(remaining / 60)).padStart(2, "0");
-  const secs = String(remaining % 60).padStart(2, "0");
   const offset = CIRC * (1 - remaining / total);
 
-  const bg = darkMode ? "#0d1b2e" : "#fce8f0";
-  const card = darkMode ? "#152236" : "#ffffff";
-  const cardBorder = darkMode ? "#2a4060" : "#f0c8dc";
-  const track = darkMode ? "#1e3450" : "#f2d0e0";
-  const text = darkMode ? "#ffffff" : "#1a1a1a";
-  const muted = darkMode ? "#8ba3c0" : "#b07090";
-  const tabBg = darkMode ? "#1a2a40" : "#fde0ed";
-  const settingBg = darkMode ? "#1a2a40" : "#fde8f2";
+  // 🎨 Theme
+  const bg = darkMode ? "#0f172a" : "#fce8f0";
+  const card = darkMode ? "#111827" : "#ffffff";
+  const text = darkMode ? "#ffffff" : "#111111";
+  const muted = darkMode ? "#94a3b8" : "#b07090";
+  const border = darkMode ? "#334155" : "#f0c8dc";
+  const soft = darkMode ? "#1e293b" : "#fff5fa";
+
+  const glass = {
+    background: soft,
+    border: `1px solid ${border}`,
+    boxShadow: darkMode
+      ? "0 8px 24px rgba(0,0,0,0.25)"
+      : "0 8px 24px rgba(244,114,182,0.12)",
+  };
+
+  const roundBtn = {
+    width: "52px",
+    height: "52px",
+    borderRadius: "50%",
+    border: "none",
+    cursor: "pointer",
+    color: text,
+    fontSize: "20px",
+    ...glass,
+  };
+
+  const cardStyle = {
+    padding: "14px",
+    minWidth: "92px",
+    borderRadius: "18px",
+    border: `1px solid ${border}`,
+    cursor: "pointer",
+    textAlign: "center" as const,
+    ...glass,
+    transition: "all 0.2s ease",
+  };
+
+  const editSeconds = (
+    label: string,
+    current: number,
+    setter: (n: number) => void
+  ) => {
+    const input = prompt(`Set ${label} in seconds`, String(current));
+    if (!input) return;
+
+    const val = Number(input);
+    if (!isNaN(val) && val > 0) {
+      setter(val);
+
+      if (
+        (label === "Focus" && mode === "focus") ||
+        (label === "Short break" && mode === "short") ||
+        (label === "Long break" && mode === "long")
+      ) {
+        setRemaining(val);
+      }
+    }
+  };
 
   return (
     <div
@@ -116,182 +181,232 @@ export default function Pomodoro({ darkMode }: { darkMode: boolean }) {
         minHeight: "100vh",
         background: bg,
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
         justifyContent: "center",
-        gap: "1.5rem",
+        alignItems: "center",
         padding: "2rem",
       }}
     >
-      {/* Tabs */}
       <div
         style={{
-          display: "flex",
-          gap: "6px",
-          background: tabBg,
-          borderRadius: "999px",
-          padding: "4px",
+          width: "100%",
+          maxWidth: "520px",
+          padding: "32px",
+          borderRadius: "30px",
+          ...glass,
         }}
       >
-        {(["focus", "short", "long"] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => switchMode(m)}
-            style={{
-              border: "none",
-              borderRadius: "999px",
-              padding: "6px 16px",
-              cursor: "pointer",
-              background:
-                mode === m
-                  ? "linear-gradient(135deg,#f77fb0,#f4874a)"
-                  : "transparent",
-              color: mode === m ? "white" : muted,
-            }}
-          >
-            {m === "focus"
-              ? "Focus"
-              : m === "short"
-              ? "Short break"
-              : "Long break"}
-          </button>
-        ))}
-      </div>
+        {/* Tabs */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "8px",
+            marginBottom: "28px",
+          }}
+        >
+          {(["focus", "short", "long"] as Mode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => switchMode(m)}
+              style={{
+                border: "none",
+                padding: "10px 18px",
+                borderRadius: "999px",
+                cursor: "pointer",
+                fontWeight: 600,
+                background:
+                  mode === m
+                    ? "linear-gradient(135deg,#f472b6,#fb923c)"
+                    : soft,
+                color: mode === m ? "white" : muted,
+              }}
+            >
+              {m === "focus"
+                ? "Focus"
+                : m === "short"
+                ? "Short Break"
+                : "Long Break"}
+            </button>
+          ))}
+        </div>
 
-      {/* Timer */}
-      <div
-        style={{
-          background: card,
-          borderRadius: "50%",
-          padding: "10px",
-          boxShadow: `0 0 0 4px ${cardBorder}`,
-        }}
-      >
-        <div style={{ position: "relative", width: "210px", height: "210px" }}>
-          <svg
-            width="210"
-            height="210"
-            viewBox="0 0 210 210"
-            style={{ transform: "rotate(-90deg)" }}
-          >
-            <circle
-              cx="105"
-              cy="105"
-              r="95"
-              fill="none"
-              stroke={track}
-              strokeWidth="10"
-            />
-            <circle
-              cx="105"
-              cy="105"
-              r="95"
-              fill="none"
-              strokeWidth="10"
-              strokeLinecap="round"
-              stroke="url(#grad)"
-              strokeDasharray={CIRC}
-              strokeDashoffset={offset}
-            />
-            <defs>
-              <linearGradient id="grad">
-                <stop offset="0%" stopColor="#f77fb0" />
-                <stop offset="100%" stopColor="#f4874a" />
-              </linearGradient>
-            </defs>
-          </svg>
+        {/* Circle Timer */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "24px",
+          }}
+        >
+          <div style={{ position: "relative", width: 240, height: 240 }}>
+            <svg
+              width="240"
+              height="240"
+              viewBox="0 0 240 240"
+              style={{ transform: "rotate(-90deg)" }}
+            >
+              <circle
+                cx="120"
+                cy="120"
+                r="95"
+                fill="none"
+                stroke={border}
+                strokeWidth="12"
+              />
+              <circle
+                cx="120"
+                cy="120"
+                r="95"
+                fill="none"
+                strokeWidth="12"
+                strokeLinecap="round"
+                stroke="url(#grad)"
+                strokeDasharray={CIRC}
+                strokeDashoffset={offset}
+              />
+              <defs>
+                <linearGradient id="grad">
+                  <stop offset="0%" stopColor="#f472b6" />
+                  <stop offset="100%" stopColor="#fb923c" />
+                </linearGradient>
+              </defs>
+            </svg>
 
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%,-50%)",
-              textAlign: "center",
-            }}
-          >
-            <div style={{ fontSize: "46px", color: text }}>
-              {mins}:{secs}
-            </div>
-            <div style={{ fontSize: "11px", color: muted }}>
-              {LABELS[mode].toUpperCase()}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "52px",
+                  fontWeight: 700,
+                  color: text,
+                }}
+              >
+                {formatTime(remaining)}
+              </div>
+
+              <div style={{ color: muted, fontSize: "13px", marginTop: "6px" }}>
+                {LABELS[mode].toUpperCase()}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Controls */}
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          onClick={() => {
-            setRunning(false);
-            setRemaining(total);
-          }}
-        >
-          ↺
-        </button>
-
-        <button
-          onClick={() => setRunning((r) => !r)}
+        {/* Controls */}
+        <div
           style={{
-            background: "linear-gradient(135deg,#f77fb0,#f4874a)",
-            color: "white",
-            border: "none",
-            padding: "12px 40px",
-            borderRadius: "999px",
+            display: "flex",
+            justifyContent: "center",
+            gap: "14px",
+            marginBottom: "28px",
           }}
         >
-          {running ? "Pause" : "Start"}
-        </button>
-
-        <button
-          onClick={() => {
-            setRemaining(0);
-            handleComplete();
-          }}
-        >
-          ▶▶
-        </button>
-      </div>
-
-      {/* Editable Settings */}
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          flexWrap: "wrap",
-          justifyContent: "center",
-        }}
-      >
-        {[
-          ["Focus", focusTime, setFocusTime],
-          ["Short break", shortTime, setShortTime],
-          ["Long break", longTime, setLongTime],
-          ["Sessions", sessionsGoal, setSessionsGoal],
-        ].map(([label, val, setter]: any) => (
           <button
-            key={label}
+            style={roundBtn}
             onClick={() => {
-              const input = prompt(`Set ${label}`, String(val));
-              if (input && !isNaN(Number(input)) && Number(input) > 0) {
-                setter(Number(input));
-              }
-            }}
-            style={{
-              background: settingBg,
-              border: `1px solid ${cardBorder}`,
-              borderRadius: "12px",
-              padding: "10px 14px",
-              minWidth: "76px",
-              cursor: "pointer",
+              setRunning(false);
+              setRemaining(total);
             }}
           >
-            <div style={{ fontSize: "11px", color: muted }}>{label}</div>
-            <div style={{ fontSize: "17px", color: text }}>
-              {label === "Sessions" ? val : `${val}m`}
-            </div>
+            ↺
           </button>
-        ))}
+
+          <button
+            onClick={() => setRunning((r) => !r)}
+            style={{
+              border: "none",
+              padding: "14px 44px",
+              borderRadius: "999px",
+              fontWeight: 700,
+              fontSize: "17px",
+              cursor: "pointer",
+              color: "white",
+              background:
+                "linear-gradient(135deg,#f472b6,#fb923c)",
+              boxShadow: "0 8px 20px rgba(244,114,182,0.3)",
+            }}
+          >
+            {running ? "Pause" : "Start"}
+          </button>
+
+          <button style={roundBtn} onClick={nextMode}>
+            ⏭
+          </button>
+        </div>
+
+        {/* Settings Cards */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4,1fr)",
+            gap: "12px",
+          }}
+        >
+          <div
+            style={cardStyle}
+            onClick={() => editSeconds("Focus", focusTime, setFocusTime)}
+          >
+            <div style={{ color: muted, fontSize: "12px" }}>Focus</div>
+            <div style={{ color: text, fontWeight: 700 }}>
+              {formatCard(focusTime)}
+            </div>
+          </div>
+
+          <div
+            style={cardStyle}
+            onClick={() =>
+              editSeconds("Short break", shortTime, setShortTime)
+            }
+          >
+            <div style={{ color: muted, fontSize: "12px" }}>
+              Short Break
+            </div>
+            <div style={{ color: text, fontWeight: 700 }}>
+              {formatCard(shortTime)}
+            </div>
+          </div>
+
+          <div
+            style={cardStyle}
+            onClick={() =>
+              editSeconds("Long break", longTime, setLongTime)
+            }
+          >
+            <div style={{ color: muted, fontSize: "12px" }}>
+              Long Break
+            </div>
+            <div style={{ color: text, fontWeight: 700 }}>
+              {formatCard(longTime)}
+            </div>
+          </div>
+
+          <div
+            style={cardStyle}
+            onClick={() => {
+              const input = prompt(
+                "Set sessions before long break",
+                String(sessionsGoal)
+              );
+              if (!input) return;
+              const val = Number(input);
+              if (!isNaN(val) && val > 0) setSessionsGoal(val);
+            }}
+          >
+            <div style={{ color: muted, fontSize: "12px" }}>
+              Sessions
+            </div>
+            <div style={{ color: text, fontWeight: 700 }}>
+              {sessionsGoal}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
