@@ -10,14 +10,14 @@ function formatTime(s: number) {
 }
 
 export default function Pomodoro() {
-  const [focusMins, setFocusMins]   = useState(() => Number(localStorage.getItem("focusMins"))   || 25);
-  const [shortMins, setShortMins]   = useState(() => Number(localStorage.getItem("shortMins"))   || 5);
-  const [longMins, setLongMins]     = useState(() => Number(localStorage.getItem("longMins"))    || 15);
+  const [focusMins, setFocusMins]     = useState(() => Number(localStorage.getItem("focusMins"))   || 25);
+  const [shortMins, setShortMins]     = useState(() => Number(localStorage.getItem("shortMins"))   || 5);
+  const [longMins, setLongMins]       = useState(() => Number(localStorage.getItem("longMins"))    || 15);
   const [sessionsGoal, setSessionsGoal] = useState(() => Number(localStorage.getItem("sessionsGoal")) || 4);
 
-  // Which card is being edited: "focus" | "short" | "long" | "sessions" | null
-  const [editing, setEditing] = useState<string | null>(null);
-  const [editVal, setEditVal] = useState("");
+  const [editing, setEditing]   = useState<string | null>(null);
+  const [editVal, setEditVal]   = useState("");
+  const [editUnit, setEditUnit] = useState<"min" | "sec">("min");
 
   const focusTime = focusMins * 60;
   const shortTime = shortMins * 60;
@@ -78,25 +78,25 @@ export default function Pomodoro() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [running, mode, completed]);
 
-  // When minutes change, update remaining if that mode is active and timer isn't running
   useEffect(() => { if (mode === "focus" && !running) setRemaining(focusTime); }, [focusMins]);
   useEffect(() => { if (mode === "short" && !running) setRemaining(shortTime); }, [shortMins]);
   useEffect(() => { if (mode === "long"  && !running) setRemaining(longTime);  }, [longMins]);
 
   const offset = CIRC * (1 - remaining / total);
 
-  // Inline edit helpers
   function startEdit(key: string, currentVal: number) {
     setEditing(key);
+    setEditUnit("min");
     setEditVal(String(currentVal));
   }
 
   function commitEdit() {
     const val = Number(editVal);
     if (isNaN(val) || val <= 0) { setEditing(null); return; }
-    if (editing === "focus")    setFocusMins(val);
-    if (editing === "short")    setShortMins(val);
-    if (editing === "long")     setLongMins(val);
+    const inMins = editUnit === "sec" ? Math.round((val / 60) * 10) / 10 : val;
+    if (editing === "focus")    setFocusMins(inMins);
+    if (editing === "short")    setShortMins(inMins);
+    if (editing === "long")     setLongMins(inMins);
     if (editing === "sessions") setSessionsGoal(val);
     setEditing(null);
   }
@@ -116,7 +116,7 @@ export default function Pomodoro() {
     { key: "focus",    label: "Focus",       val: focusMins,    unit: "min" },
     { key: "short",    label: "Short Break", val: shortMins,    unit: "min" },
     { key: "long",     label: "Long Break",  val: longMins,     unit: "min" },
-    { key: "sessions", label: "Sessions",    val: sessionsGoal, unit: "" },
+    { key: "sessions", label: "Sessions",    val: sessionsGoal, unit: ""    },
   ];
 
   return (
@@ -170,10 +170,11 @@ export default function Pomodoro() {
           <button style={roundBtn} onClick={nextMode}>⏭</button>
         </div>
 
-        {/* Settings Cards — inline edit */}
+        {/* Settings Cards */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "12px" }}>
           {settingsCards.map(({ key, label, val, unit }) => (
-            <div key={key}
+            <div
+              key={key}
               onClick={() => !editing && startEdit(key, val)}
               style={{
                 padding: "14px", borderRadius: "18px", cursor: "pointer",
@@ -182,6 +183,7 @@ export default function Pomodoro() {
               }}
             >
               <div style={{ color: "var(--text2)", fontSize: "12px", marginBottom: "6px" }}>{label}</div>
+
               {editing === key ? (
                 <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "center" }}>
                   <input
@@ -196,7 +198,23 @@ export default function Pomodoro() {
                       background: "var(--bg)", color: "var(--text)", padding: "2px 4px",
                     }}
                   />
-                  <div style={{ fontSize: "10px", color: "var(--text2)" }}>{unit || "count"} · Enter ✓</div>
+                  {key !== "sessions" && (
+                    <div style={{ display: "flex", gap: "4px", marginTop: "2px" }}>
+                      {(["min", "sec"] as const).map((u) => (
+                        <button
+                          key={u}
+                          onClick={() => setEditUnit(u)}
+                          style={{
+                            fontSize: "10px", padding: "2px 6px", borderRadius: "6px",
+                            border: "none", cursor: "pointer", fontWeight: 600,
+                            background: editUnit === u ? "#f472b6" : "var(--bg)",
+                            color: editUnit === u ? "white" : "var(--text2)",
+                          }}
+                        >{u}</button>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ fontSize: "10px", color: "var(--text2)" }}>Enter ✓ · Esc ✗</div>
                 </div>
               ) : (
                 <div style={{ color: "var(--text)", fontWeight: 700 }}>
@@ -206,6 +224,7 @@ export default function Pomodoro() {
             </div>
           ))}
         </div>
+
       </div>
     </div>
   );
