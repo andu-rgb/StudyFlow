@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import confetti from "canvas-confetti";
 import API_BASE from "../config";
 
 interface Habit {
@@ -8,92 +9,211 @@ interface Habit {
   completed: boolean;
 }
 
-function Stats() {
+function Dashboard() {
   const [habits, setHabits] = useState<Habit[]>([]);
+  const [newHabit, setNewHabit] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    axios
-      .get(`${API_BASE}/api/habits`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => setHabits(res.data))
-      .catch((err) => console.log(err));
+    fetchHabits();
   }, []);
 
-  const total = habits.length;
-  const completed = habits.filter(
-    (h) => h.completed
-  ).length;
-  const pending = total - completed;
+  async function fetchHabits() {
+    const token = localStorage.getItem("token");
 
-  const completionRate =
-    total > 0
-      ? Math.round((completed / total) * 100)
-      : 0;
+    try {
+      const res = await axios.get(
+        `${API_BASE}/api/habits`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setHabits(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function addHabit() {
+    if (!newHabit.trim()) return;
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await axios.post(
+        `${API_BASE}/api/habits`,
+        { name: newHabit },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setHabits([...habits, res.data]);
+      setNewHabit("");
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function toggleHabit(
+    id: string,
+    completed: boolean
+  ) {
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await axios.put(
+        `${API_BASE}/api/habits/${id}`,
+        { completed: !completed },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!completed) {
+        confetti({
+          particleCount: 90,
+          spread: 65,
+          origin: { y: 0.7 },
+        });
+      }
+
+      setHabits(
+        habits.map((habit) =>
+          habit._id === id ? res.data : habit
+        )
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function deleteHabit(id: string) {
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.delete(
+        `${API_BASE}/api/habits/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setHabits(
+        habits.filter((habit) => habit._id !== id)
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const card = {
     background: "var(--card)",
-    color: "var(--text)",
     borderRadius: "28px",
     padding: "28px",
     boxShadow:
-      "0 12px 35px rgba(236,72,153,0.08)",
+      "0 10px 30px rgba(0,0,0,0.06)",
   };
 
-  const statCards = [
-    {
-      title: "Total Tasks",
-      value: total,
-      color: "var(--accent)",
-    },
-    {
-      title: "Completed",
-      value: completed,
-      color: "#22c55e",
-    },
-    {
-      title: "Pending",
-      value: pending,
-      color: "#f59e0b",
-    },
-    {
-      title: "Completion",
-      value: `${completionRate}%`,
-      color: "#3b82f6",
-    },
-  ];
+  const completedCount = habits.filter(
+    (h) => h.completed
+  ).length;
 
   return (
     <div className="page">
-      {/* HEADER */}
-      <div style={{ marginBottom: "26px" }}>
-        <h1
+      {/* Header */}
+      <div style={{ marginBottom: "24px" }}>
+        <p
           style={{
             margin: 0,
-            fontSize: "58px",
+            color: "var(--text2)",
+            fontWeight: 700,
+            letterSpacing: "0.03em",
+          }}
+        >
+          DAILY PRODUCTIVITY
+        </p>
+
+        <h1
+          style={{
+            margin: "8px 0",
+            fontSize: "64px",
             color: "var(--text)",
           }}
         >
-          Study Progress ✨
+          Dashboard ✨
         </h1>
 
         <p
           style={{
-            marginTop: "8px",
             color: "var(--text2)",
             fontSize: "18px",
+            marginTop: 0,
           }}
         >
-          Track your momentum and celebrate
-          consistency.
+          Add tasks, complete tasks, and stay
+          consistent every day.
         </p>
       </div>
 
-      {/* TOP STATS */}
+      {/* Add Task */}
+      <div
+        style={{
+          ...card,
+          marginBottom: "24px",
+          display: "flex",
+          gap: "14px",
+          alignItems: "center",
+        }}
+      >
+        <input
+          value={newHabit}
+          placeholder="Add a new study task..."
+          onChange={(e) =>
+            setNewHabit(e.target.value)
+          }
+          onKeyDown={(e) =>
+            e.key === "Enter" && addHabit()
+          }
+          style={{
+            flex: 1,
+            padding: "16px 18px",
+            borderRadius: "18px",
+            border:
+              "1px solid rgba(0,0,0,0.08)",
+            outline: "none",
+            background: "var(--bg)",
+            color: "var(--text)",
+            fontSize: "16px",
+          }}
+        />
+
+        <button
+          onClick={addHabit}
+          style={{
+            border: "none",
+            padding: "16px 22px",
+            borderRadius: "18px",
+            fontWeight: 700,
+            cursor: "pointer",
+            color: "white",
+            background:
+              "linear-gradient(to right,#f472b6,#fb7185)",
+          }}
+        >
+          + Add Task
+        </button>
+      </div>
+
+      {/* Quick Stats */}
       <div
         style={{
           display: "grid",
@@ -103,13 +223,28 @@ function Stats() {
           marginBottom: "24px",
         }}
       >
-        {statCards.map((item, i) => (
+        {[
+          {
+            label: "Total Tasks",
+            value: habits.length,
+          },
+          {
+            label: "Completed",
+            value: completedCount,
+          },
+          {
+            label: "Remaining",
+            value:
+              habits.length -
+              completedCount,
+          },
+        ].map((item, i) => (
           <div key={i} style={card}>
             <h2
               style={{
                 margin: 0,
-                fontSize: "50px",
-                color: item.color,
+                fontSize: "46px",
+                color: "var(--accent)",
               }}
             >
               {item.value}
@@ -119,80 +254,26 @@ function Stats() {
               style={{
                 marginTop: "8px",
                 color: "var(--text2)",
-                fontSize: "16px",
                 fontWeight: 600,
               }}
             >
-              {item.title}
+              {item.label}
             </p>
           </div>
         ))}
       </div>
 
-      {/* PROGRESS SECTION */}
-      <div
-        style={{
-          ...card,
-          marginBottom: "24px",
-        }}
-      >
-        <h2
-          style={{
-            marginTop: 0,
-            marginBottom: "16px",
-            fontSize: "34px",
-          }}
-        >
-          Today's Goal 🌷
-        </h2>
-
-        <div
-          style={{
-            height: "24px",
-            background: "var(--bg)",
-            borderRadius: "999px",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              width: `${completionRate}%`,
-              height: "100%",
-              borderRadius: "999px",
-              background:
-                "linear-gradient(to right,#f472b6,#fb923c)",
-              transition: "0.5s ease",
-            }}
-          />
-        </div>
-
-        <p
-          style={{
-            marginTop: "14px",
-            color: "var(--text2)",
-            fontSize: "17px",
-          }}
-        >
-          {completed} of {total} tasks completed
-          today.
-        </p>
-      </div>
-
-      {/* TASK BREAKDOWN */}
-      <div
-        style={{
-          ...card,
-          marginBottom: "24px",
-        }}
-      >
+      {/* Tasks */}
+      <div style={card}>
         <h2
           style={{
             marginTop: 0,
             marginBottom: "18px",
-            fontSize: "34px",
+            fontSize: "38px",
+            color: "var(--text)",
           }}
         >
-          Task Breakdown 📚
+          My Tasks 🌷
         </h2>
 
         {habits.length === 0 ? (
@@ -200,11 +281,10 @@ function Stats() {
             style={{
               color: "var(--text2)",
               fontSize: "17px",
-              margin: 0,
             }}
           >
-            No tasks yet — start adding tasks
-            on the Dashboard.
+            No tasks yet — add your first one
+            above.
           </p>
         ) : (
           habits.map((habit) => (
@@ -215,24 +295,26 @@ function Stats() {
                 justifyContent:
                   "space-between",
                 alignItems: "center",
-                padding: "14px 0",
+                gap: "18px",
+                padding: "16px 0",
                 borderBottom:
                   "1px solid rgba(0,0,0,0.05)",
-                gap: "16px",
               }}
             >
               <div>
                 <h3
                   style={{
                     margin: 0,
-                    fontSize: "22px",
+                    fontSize: "24px",
+                    color:
+                      "var(--text)",
                     textDecoration:
                       habit.completed
                         ? "line-through"
                         : "none",
                     opacity:
                       habit.completed
-                        ? 0.65
+                        ? 0.6
                         : 1,
                   }}
                 >
@@ -241,70 +323,85 @@ function Stats() {
 
                 <p
                   style={{
-                    margin: "6px 0 0",
+                    margin:
+                      "6px 0 0 0",
                     color:
                       "var(--text2)",
-                    fontSize: "14px",
+                    fontSize:
+                      "14px",
                   }}
                 >
                   {habit.completed
-                    ? "Completed"
-                    : "Pending"}
+                    ? "Completed ✓"
+                    : "Ready to focus"}
                 </p>
               </div>
 
               <div
                 style={{
-                  padding:
-                    "8px 14px",
-                  borderRadius:
-                    "999px",
-                  fontWeight: 700,
-                  fontSize: "14px",
-                  background:
-                    habit.completed
-                      ? "linear-gradient(to right,#f472b6,#fb923c)"
-                      : "var(--bg)",
-                  color:
-                    habit.completed
-                      ? "white"
-                      : "var(--text2)",
+                  display: "flex",
+                  gap: "10px",
                 }}
               >
-                {habit.completed
-                  ? "Done ✓"
-                  : "Pending"}
+                <button
+                  onClick={() =>
+                    toggleHabit(
+                      habit._id,
+                      habit.completed
+                    )
+                  }
+                  style={{
+                    border: "none",
+                    padding:
+                      "10px 16px",
+                    borderRadius:
+                      "999px",
+                    fontWeight: 700,
+                    cursor:
+                      "pointer",
+                    color: "white",
+                    background:
+                      habit.completed
+                        ? "#9ca3af"
+                        : "linear-gradient(to right,#22c55e,#16a34a)",
+                  }}
+                >
+                  {habit.completed
+                    ? "Undo"
+                    : "Done"}
+                </button>
+
+                <button
+                  onClick={() =>
+                    deleteHabit(
+                      habit._id
+                    )
+                  }
+                  style={{
+                    border:
+                      "1px solid rgba(0,0,0,0.08)",
+                    padding:
+                      "10px 16px",
+                    borderRadius:
+                      "999px",
+                    fontWeight: 700,
+                    cursor:
+                      "pointer",
+                    color:
+                      "var(--text)",
+                    background:
+                      "var(--bg)",
+                  }}
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))
         )}
       </div>
-
-      {/* MOTIVATION CARD */}
-      <div
-        style={{
-          background:
-            "linear-gradient(to right,#f9a8d4,#fdba74)",
-          color: "#7a1146",
-          borderRadius: "28px",
-          padding: "34px",
-          textAlign: "center",
-          fontWeight: 700,
-          fontSize: "24px",
-          boxShadow:
-            "0 12px 35px rgba(236,72,153,0.08)",
-        }}
-      >
-        {completionRate === 100
-          ? "🎉 Perfect day — every task completed!"
-          : completionRate >= 70
-          ? `Amazing work — you're ${completionRate}% done today!`
-          : completionRate >= 40
-          ? `Great progress — keep going, you're ${completionRate}% there!`
-          : "Small steps count. Start one task right now 🌸"}
-      </div>
     </div>
   );
 }
 
-export default Stats;
+export default Dashboard;
