@@ -1,27 +1,28 @@
-/* =====================================
-   STUDYFLOW FINAL PREMIUM THEME SYSTEM
-   Pink • Purple • Matcha • Ocean
-===================================== */
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap");
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "SF Pro Display",
     "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
   transition: background 0.25s ease, color 0.25s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Default fallback */
+/* =====================================
+   DEFAULT FALLBACK
+===================================== */
 :root {
-  --bg: #fdf2f8;
+  --bg: #fceff5;
   --card: #ffffff;
-  --text: #111111;
-  --text2: #6b7280;
+  --text: #3f1d2e;
+  --text2: #7c6a75;
   --nav: #ec4899;
 
   --accent1: #ec4899;
-  --accent2: #f97316;
+  --accent2: #f9a8d4;
 
   --buttonText: #ffffff;
 }
@@ -30,14 +31,14 @@ body {
    🌸 PINK LIGHT
 ===================================== */
 [data-theme="pink-light"] {
-  --bg: #fdf2f8;
+  --bg: #fceff5;
   --card: #ffffff;
-  --text: #111111;
-  --text2: #6b7280;
+  --text: #4a2034;
+  --text2: #7c6a75;
   --nav: #ec4899;
 
   --accent1: #ec4899;
-  --accent2: #f97316;
+  --accent2: #f9a8d4;
 
   --buttonText: #ffffff;
 }
@@ -46,14 +47,14 @@ body {
    🌙 PINK DARK
 ===================================== */
 [data-theme="pink-dark"] {
-  --bg: #14060f;
-  --card: #24101d;
+  --bg: #1b0d15;
+  --card: #2a1522;
   --text: #ffffff;
-  --text2: #d1d5db;
+  --text2: #d4b9c7;
   --nav: #be185d;
 
   --accent1: #f472b6;
-  --accent2: #fb923c;
+  --accent2: #fb7185;
 
   --buttonText: #ffffff;
 }
@@ -62,14 +63,14 @@ body {
    💜 PURPLE LIGHT
 ===================================== */
 [data-theme="purple-light"] {
-  --bg: #f5f3ff;
+  --bg: #f5f0ff;
   --card: #ffffff;
-  --text: #111111;
-  --text2: #6b7280;
-  --nav: #8b5cf6;
+  --text: #44235e;
+  --text2: #7c6f8c;
+  --nav: #a78bfa;
 
   --accent1: #8b5cf6;
-  --accent2: #ec4899;
+  --accent2: #d8b4fe;
 
   --buttonText: #ffffff;
 }
@@ -78,14 +79,14 @@ body {
    🌌 PURPLE DARK
 ===================================== */
 [data-theme="purple-dark"] {
-  --bg: #0f0820;
-  --card: #1d1233;
+  --bg: #140f24;
+  --card: #211737;
   --text: #ffffff;
-  --text2: #c4b5fd;
-  --nav: #6d28d9;
+  --text2: #cfc4ef;
+  --nav: #7c3aed;
 
   --accent1: #8b5cf6;
-  --accent2: #ec4899;
+  --accent2: #c084fc;
 
   --buttonText: #ffffff;
 }
@@ -94,14 +95,14 @@ body {
    🍵 MATCHA LIGHT
 ===================================== */
 [data-theme="matcha-light"] {
-  --bg: #eef7ea;
+  --bg: #edf7ea;
   --card: #ffffff;
-  --text: #111111;
-  --text2: #6b7280;
-  --nav: #65a30d;
+  --text: #2e4631;
+  --text2: #6e7e6f;
+  --nav: #84cc16;
 
-  --accent1: #84cc16;
-  --accent2: #22c55e;
+  --accent1: #65a30d;
+  --accent2: #86efac;
 
   --buttonText: #ffffff;
 }
@@ -110,14 +111,14 @@ body {
    🌿 MATCHA DARK
 ===================================== */
 [data-theme="matcha-dark"] {
-  --bg: #0e1a11;
-  --card: #16241a;
+  --bg: #101811;
+  --card: #1a251c;
   --text: #ffffff;
-  --text2: #cbd5e1;
-  --nav: #14532d;
+  --text2: #c7d5c8;
+  --nav: #3f6212;
 
-  --accent1: #84cc16;
-  --accent2: #22c55e;
+  --accent1: #65a30d;
+  --accent2: #4ade80;
 
   --buttonText: #ffffff;
 }
@@ -126,14 +127,14 @@ body {
    🌊 OCEAN LIGHT
 ===================================== */
 [data-theme="ocean-light"] {
-  --bg: #eff6ff;
+  --bg: #eef7ff;
   --card: #ffffff;
-  --text: #111111;
-  --text2: #64748b;
+  --text: #1d3d57;
+  --text2: #6b7e90;
   --nav: #38bdf8;
 
   --accent1: #38bdf8;
-  --accent2: #2563eb;
+  --accent2: #60a5fa;
 
   --buttonText: #ffffff;
 }
@@ -142,14 +143,14 @@ body {
    🌊 OCEAN DARK
 ===================================== */
 [data-theme="ocean-dark"] {
-  --bg: #07111f;
-  --card: #102033;
+  --bg: #09131f;
+  --card: #132233;
   --text: #ffffff;
-  --text2: #cbd5e1;
-  --nav: #1d4ed8;
+  --text2: #c3d4e6;
+  --nav: #2563eb;
 
   --accent1: #38bdf8;
-  --accent2: #2563eb;
+  --accent2: #3b82f6;
 
   --buttonText: #ffffff;
 }
@@ -166,8 +167,8 @@ body {
   background: var(--card);
   color: var(--text);
   padding: 32px;
-  border-radius: 24px;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+  border-radius: 26px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.06);
   transition: all 0.25s ease;
 }
 
@@ -175,15 +176,31 @@ body {
   transform: translateY(-2px);
 }
 
-button {
-  font-family: inherit;
-}
-
+button,
 input {
   font-family: inherit;
 }
 
-/* Nice selection */
+button {
+  font-weight: 700;
+}
+
+h1 {
+  font-weight: 800;
+}
+
+h2,
+h3 {
+  font-weight: 700;
+}
+
+p,
+span,
+div {
+  font-weight: 500;
+}
+
+/* Selection */
 ::selection {
   background: var(--accent1);
   color: white;
@@ -195,7 +212,7 @@ input {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.15);
+  background: rgba(0, 0, 0, 0.14);
   border-radius: 999px;
 }
 
