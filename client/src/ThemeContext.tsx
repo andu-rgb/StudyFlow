@@ -6,7 +6,9 @@ type Theme =
   | "purple-light"
   | "purple-dark"
   | "matcha-light"
-  | "matcha-dark";
+  | "matcha-dark"
+  | "ocean-light"
+  | "ocean-dark";
 
 const pairs: Record<Theme, Theme> = {
   "pink-light": "pink-dark",
@@ -17,6 +19,9 @@ const pairs: Record<Theme, Theme> = {
 
   "matcha-light": "matcha-dark",
   "matcha-dark": "matcha-light",
+
+  "ocean-light": "ocean-dark",
+  "ocean-dark": "ocean-light",
 };
 
 const ThemeContext = createContext({

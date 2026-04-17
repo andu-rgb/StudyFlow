@@ -1,3 +1,7 @@
+/* =====================================
+   STUDYFLOW FINAL PREMIUM THEME SYSTEM
+   Pink • Purple • Matcha • Ocean
+===================================== */
 
 body {
   margin: 0;
@@ -8,12 +12,13 @@ body {
   transition: background 0.25s ease, color 0.25s ease;
 }
 
-/* Default */
+/* Default fallback */
 :root {
-  --bg: #fff7fb;
+  --bg: #fdf2f8;
   --card: #ffffff;
   --text: #111111;
   --text2: #6b7280;
+  --nav: #ec4899;
 
   --accent1: #ec4899;
   --accent2: #f97316;
@@ -21,29 +26,31 @@ body {
   --buttonText: #ffffff;
 }
 
-/* ===================================
+/* =====================================
    🌸 PINK LIGHT
-=================================== */
+===================================== */
 [data-theme="pink-light"] {
   --bg: #fdf2f8;
   --card: #ffffff;
   --text: #111111;
   --text2: #6b7280;
+  --nav: #ec4899;
 
-  --accent1: #ec4899; /* pink */
-  --accent2: #f97316; /* orange */
+  --accent1: #ec4899;
+  --accent2: #f97316;
 
   --buttonText: #ffffff;
 }
 
-/* ===================================
+/* =====================================
    🌙 PINK DARK
-=================================== */
+===================================== */
 [data-theme="pink-dark"] {
   --bg: #14060f;
   --card: #24101d;
   --text: #ffffff;
   --text2: #d1d5db;
+  --nav: #be185d;
 
   --accent1: #f472b6;
   --accent2: #fb923c;
@@ -51,14 +58,15 @@ body {
   --buttonText: #ffffff;
 }
 
-/* ===================================
+/* =====================================
    💜 PURPLE LIGHT
-=================================== */
+===================================== */
 [data-theme="purple-light"] {
   --bg: #f5f3ff;
   --card: #ffffff;
   --text: #111111;
   --text2: #6b7280;
+  --nav: #8b5cf6;
 
   --accent1: #8b5cf6;
   --accent2: #ec4899;
@@ -66,14 +74,15 @@ body {
   --buttonText: #ffffff;
 }
 
-/* ===================================
+/* =====================================
    🌌 PURPLE DARK
-=================================== */
+===================================== */
 [data-theme="purple-dark"] {
   --bg: #0f0820;
   --card: #1d1233;
   --text: #ffffff;
   --text2: #c4b5fd;
+  --nav: #6d28d9;
 
   --accent1: #8b5cf6;
   --accent2: #ec4899;
@@ -81,9 +90,73 @@ body {
   --buttonText: #ffffff;
 }
 
-/* ===================================
+/* =====================================
+   🍵 MATCHA LIGHT
+===================================== */
+[data-theme="matcha-light"] {
+  --bg: #eef7ea;
+  --card: #ffffff;
+  --text: #111111;
+  --text2: #6b7280;
+  --nav: #65a30d;
+
+  --accent1: #84cc16;
+  --accent2: #22c55e;
+
+  --buttonText: #ffffff;
+}
+
+/* =====================================
+   🌿 MATCHA DARK
+===================================== */
+[data-theme="matcha-dark"] {
+  --bg: #0e1a11;
+  --card: #16241a;
+  --text: #ffffff;
+  --text2: #cbd5e1;
+  --nav: #14532d;
+
+  --accent1: #84cc16;
+  --accent2: #22c55e;
+
+  --buttonText: #ffffff;
+}
+
+/* =====================================
+   🌊 OCEAN LIGHT
+===================================== */
+[data-theme="ocean-light"] {
+  --bg: #eff6ff;
+  --card: #ffffff;
+  --text: #111111;
+  --text2: #64748b;
+  --nav: #38bdf8;
+
+  --accent1: #38bdf8;
+  --accent2: #2563eb;
+
+  --buttonText: #ffffff;
+}
+
+/* =====================================
+   🌊 OCEAN DARK
+===================================== */
+[data-theme="ocean-dark"] {
+  --bg: #07111f;
+  --card: #102033;
+  --text: #ffffff;
+  --text2: #cbd5e1;
+  --nav: #1d4ed8;
+
+  --accent1: #38bdf8;
+  --accent2: #2563eb;
+
+  --buttonText: #ffffff;
+}
+
+/* =====================================
    GLOBAL COMPONENTS
-=================================== */
+===================================== */
 
 .page {
   padding: 40px;
@@ -106,13 +179,26 @@ button {
   font-family: inherit;
 }
 
-/* Nice Inputs */
 input {
   font-family: inherit;
 }
 
-/* Selection */
+/* Nice selection */
 ::selection {
   background: var(--accent1);
   color: white;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }
