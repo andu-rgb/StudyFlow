@@ -1,3 +1,36 @@
+[data-theme="pink-light"] {
+  --bg: #fce4ec;
+  --card: #ffffff;
+  --nav: #f48fb1;
+  --accent: #e91e8c;
+  --text: #3a0020;
+  --text2: #c2185b;
+}
+[data-theme="pink-dark"] {
+  --bg: #1a0a12;
+  --card: #2d1020;
+  --nav: #ad1457;
+  --accent: #f48fb1;
+  --text: #fce4ec;
+  --text2: #f48fb1;
+}
+[data-theme="purple-light"] {
+  --bg: #f3effe;
+  --card: #ffffff;
+  --nav: #c4b5fd;
+  --accent: #7c3aed;
+  --text: #2e1065;
+  --text2: #6d28d9;
+}
+[data-theme="purple-dark"] {
+  --bg: #0f0a20;
+  --card: #1c1238;
+  --nav: #3b1fa0;
+  --accent: #a78bfa;
+  --text: #ede9fe;
+  --text2: #a78bfa;
+}
+
 body {
   margin: 0;
   font-family: "Trebuchet MS", "Arial Rounded MT Bold", sans-serif;
