@@ -80,7 +80,7 @@ function Signup() {
         }}
       >
         <h2 style={{ textAlign: "center", marginBottom: "24px" }}>
-          ❀˖ ° Create Account
+          Create Account
         </h2>
 
         {error && (
