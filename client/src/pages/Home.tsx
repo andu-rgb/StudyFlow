@@ -34,7 +34,7 @@ function Home() {
     color: "var(--text)",
     padding: "50px",
     borderRadius: "28px",
-    boxShadow: "0 12px 35px rgba(236,72,153,0.08)",
+    boxShadow: "0 12px 35px rgba(0,0,0,0.06)",
   };
 
   const smallCard = {
@@ -42,7 +42,7 @@ function Home() {
     color: "var(--text)",
     padding: "28px",
     borderRadius: "28px",
-    boxShadow: "0 12px 35px rgba(236,72,153,0.08)",
+    boxShadow: "0 12px 35px rgba(0,0,0,0.06)",
   };
 
   const softButton = {
@@ -57,7 +57,6 @@ function Home() {
 
   return (
     <div className="page">
-      {/* TOP GRID */}
       <div
         style={{
           display: "grid",
@@ -81,6 +80,7 @@ function Home() {
             Study Tracker
           </p>
 
+          {/* THEME REACTIVE TITLE */}
           <h1
             style={{
               fontSize: "86px",
@@ -88,7 +88,7 @@ function Home() {
               lineHeight: 1,
               fontWeight: 800,
               background:
-                "linear-gradient(90deg,#ec4899,#f472b6,#fb7185)",
+                "linear-gradient(90deg,var(--accent1),var(--accent2))",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
@@ -106,10 +106,8 @@ function Home() {
             }}
           >
             Stay motivated and organized with a cute tracker
-            {" "}𓍢ִ໋🌷͙֒ ᰔᩚ
           </p>
 
-          {/* BUTTONS */}
           <div
             style={{
               display: "flex",
@@ -122,7 +120,8 @@ function Home() {
               <button
                 style={{
                   ...softButton,
-                  background: "var(--nav)",
+                  background:
+                    "linear-gradient(135deg,var(--accent1),var(--accent2))",
                   color: "white",
                   minWidth: "170px",
                 }}
@@ -145,13 +144,12 @@ function Home() {
             </Link>
           </div>
 
-          {/* FEATURES */}
           <div
             style={{
               display: "flex",
               gap: "28px",
               flexWrap: "wrap",
-              color: "var(--accent)",
+              color: "var(--text2)",
               fontWeight: 700,
               fontSize: "18px",
             }}
@@ -162,7 +160,7 @@ function Home() {
           </div>
         </div>
 
-        {/* RIGHT PROGRESS CARD */}
+        {/* RIGHT SIDE */}
         <div style={smallCard}>
           <h3
             style={{
@@ -207,22 +205,20 @@ function Home() {
                     fontSize: "16px",
                   }}
                 >
-                  {habit.completed
-                    ? "✔ Completed!"
-                    : "⏸ In Progress~"}
+                  {habit.completed ? "✔ Completed!" : "⏸ In Progress~"}
                 </p>
               </div>
             ))
           )}
 
-          {/* PROGRESS BAR CARD */}
+          {/* THEME REACTIVE % BLOCK */}
           <div
             style={{
               marginTop: "20px",
               padding: "22px",
               borderRadius: "22px",
               background:
-                "linear-gradient(to right,#f472b6,#fb923c)",
+                "linear-gradient(135deg,var(--accent1),var(--accent2))",
               color: "white",
               textAlign: "center",
             }}
@@ -250,7 +246,7 @@ function Home() {
         </div>
       </div>
 
-      {/* BOTTOM 3 CARDS */}
+      {/* BOTTOM */}
       <div
         style={{
           display: "grid",
