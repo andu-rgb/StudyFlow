@@ -358,7 +358,7 @@ function Stats() {
                 : completionRate >=
                   40
                 ? "You're building momentum 💪"
-                : "Every small step counts 🌸"}
+                : "Every small step counts!"}
             </div>
 
             <p

@@ -149,7 +149,7 @@ function Dashboard() {
             color: "var(--text)",
           }}
         >
-          Dashboard ✨
+          Dashboard
         </h1>
 
         <p
@@ -273,7 +273,7 @@ function Dashboard() {
             color: "var(--text)",
           }}
         >
-          My Tasks 🌷
+          My Tasks
         </h2>
 
         {habits.length === 0 ? (
