@@ -23,8 +23,8 @@ function App() {
         <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
         <Routes>
           <Route path="/" element={<Home darkMode={darkMode} />} />
-          <Route path="/login" element={<ProtectedRoute><Login darkMode={darkMode} /></ProtectedRoute>} />
-          <Route path="/signup" element={<ProtectedRoute><Signup darkMode={darkMode}/></ProtectedRoute>} />
+          <Route path="/login" element={<Login darkMode={darkMode} />} />
+<Route path="/signup" element={<Signup darkMode={darkMode} />} />
           <Route path="/auth-success" element={<AuthSuccess />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard darkMode={darkMode} /></ProtectedRoute>} />
           <Route path="/stats" element={<ProtectedRoute><Stats darkMode={darkMode} /></ProtectedRoute>} />
