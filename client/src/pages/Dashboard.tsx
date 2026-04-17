@@ -20,50 +20,85 @@ function Dashboard({ darkMode }: { darkMode: boolean }) {
   const [newHabit, setNewHabit] = useState("");
 
   useEffect(() => {
-    axios.get(API, { headers: getAuthHeader() }).then((res) => setHabits(res.data));
+    fetchHabits();
   }, []);
 
-  useEffect(() => {
-    if (habits.length > 0 && habits.every((h) => h.completed)) {
-      confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ["#f472b6", "#fb923c", "#f9a8d4"],
-      });
+  async function fetchHabits() {
+    try {
+      const res = await axios.get(API, { headers: getAuthHeader() });
+      setHabits(res.data);
+    } catch (err) {
+      console.error(err);
     }
-  }, [habits]);
+  }
 
   async function addHabit() {
     if (newHabit.trim() === "") return;
 
-    const res = await axios.post(
-      API,
-      { name: newHabit },
-      { headers: getAuthHeader() }
-    );
+    try {
+      const res = await axios.post(
+        API,
+        { name: newHabit },
+        { headers: getAuthHeader() }
+      );
 
-    setHabits([...habits, res.data]);
-    setNewHabit("");
+      setHabits([...habits, res.data]);
+      setNewHabit("");
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async function toggleHabit(id: string, completed: boolean) {
-    const res = await axios.put(
-      `${API}/${id}`,
-      { completed: !completed },
-      { headers: getAuthHeader() }
-    );
+    const becomingCompleted = !completed;
 
-    setHabits(habits.map((h) => (h._id === id ? res.data : h)));
+    // 🎉 Confetti only when marking as done
+    if (becomingCompleted) {
+      confetti({
+        particleCount: 80,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ["#f472b6", "#fb923c", "#f9a8d4"],
+      });
+
+      confetti({
+        particleCount: 80,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ["#f472b6", "#fb923c", "#f9a8d4"],
+      });
+    }
+
+    try {
+      const res = await axios.put(
+        `${API}/${id}`,
+        { completed: becomingCompleted },
+        { headers: getAuthHeader() }
+      );
+
+      setHabits(habits.map((h) => (h._id === id ? res.data : h)));
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async function deleteHabit(id: string) {
-    await axios.delete(`${API}/${id}`, { headers: getAuthHeader() });
-    setHabits(habits.filter((h) => h._id !== id));
+    try {
+      await axios.delete(`${API}/${id}`, {
+        headers: getAuthHeader(),
+      });
+
+      setHabits(habits.filter((h) => h._id !== id));
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   return (
     <div className="page">
+      {/* HEADER */}
       <div
         style={{
           display: "flex",
@@ -126,7 +161,7 @@ function Dashboard({ darkMode }: { darkMode: boolean }) {
           <p style={{ fontSize: "20px" }}>
             <strong>No study tasks yet!</strong>
           </p>
-          <p style={{ color: "#9ca3af" }}>Add your first task above</p>
+          <p style={{ color: "#9ca3af" }}>Add your first task above ✨</p>
         </div>
       ) : (
         habits.map((habit) => (
@@ -143,6 +178,7 @@ function Dashboard({ darkMode }: { darkMode: boolean }) {
               color: darkMode ? "white" : "black",
             }}
           >
+            {/* TASK TEXT */}
             <span
               style={{
                 textDecoration: habit.completed ? "line-through" : "none",
@@ -157,6 +193,7 @@ function Dashboard({ darkMode }: { darkMode: boolean }) {
               {habit.completed ? "✔ " : "‣ "} {habit.name}
             </span>
 
+            {/* BUTTONS */}
             <div style={{ display: "flex", gap: "10px" }}>
               <button
                 onClick={() =>
@@ -172,6 +209,7 @@ function Dashboard({ darkMode }: { darkMode: boolean }) {
                   padding: "8px 16px",
                   cursor: "pointer",
                   fontWeight: "bold",
+                  transition: "0.2s",
                 }}
               >
                 {habit.completed ? "Undo" : "Done"}
