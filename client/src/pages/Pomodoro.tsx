@@ -408,7 +408,7 @@ export default function Pomodoro() {
               ...glass,
             }}
           >
-            {autoStart ? "⚡ Auto Start On" : "Auto Start Off"}
+            {autoStart ? "Auto Start On" : "Auto Start Off"}
           </button>
 
           <button
@@ -422,7 +422,7 @@ export default function Pomodoro() {
               ...glass,
             }}
           >
-            {soundOn ? "🔔 Sound On" : "🔕 Sound Off"}
+            {soundOn ? "Sound On" : "Sound Off"}
           </button>
         </div>
 
