@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import API_BASE from "../config";
 
 interface Habit {
   _id: string;
@@ -14,7 +15,7 @@ function Home({ darkMode }: { darkMode: boolean }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      axios.get("http://localhost:3001/api/habits", {
+      axios.get(`${API_BASE}/api/habits`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then((res) => setHabits(res.data));
     }
@@ -42,14 +43,9 @@ function Home({ darkMode }: { darkMode: boolean }) {
   return (
     <div className="page">
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "20px", alignItems: "center" }}>
-        {/* LEFT SIDE */}
         <div style={card}>
-          <div style={{ color: "#f9b2c2", fontWeight: "bold", marginBottom: "12px", fontSize: "18px" }}>
-            Study Tracker
-          </div>
-          <h1 style={{ fontSize: "72px", fontWeight: "bold", color: "#f4a46e", lineHeight: "1.1", textShadow: "2px 2px #f4d168" }}>
-            StudyFlow
-          </h1>
+          <div style={{ color: "#f9b2c2", fontWeight: "bold", marginBottom: "12px", fontSize: "18px" }}>Study Tracker</div>
+          <h1 style={{ fontSize: "72px", fontWeight: "bold", color: "#f4a46e", lineHeight: "1.1", textShadow: "2px 2px #f4d168" }}>StudyFlow</h1>
           <p style={{ fontSize: "24px", color: darkMode ? "#ccc" : "#555", marginBottom: "30px", lineHeight: "1.5" }}>
             Stay motivated and organized with a cute tracker 𓍢ִ໋🌷͙֒ ᰔᩚ
           </p>
@@ -72,7 +68,6 @@ function Home({ darkMode }: { darkMode: boolean }) {
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
         <div style={smallCard}>
           <h5 style={{ marginTop: 0, color: darkMode ? "white" : "black" }}>Today's Progress 🌷</h5>
           {habits.length === 0 ? (
@@ -92,7 +87,6 @@ function Home({ darkMode }: { darkMode: boolean }) {
         </div>
       </div>
 
-      {/* BOTTOM FEATURES */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", marginTop: "20px" }}>
         {["Daily Tracking", "Streak Building", "Progress Insights"].map((title, i) => (
           <div key={i} style={{ background: darkMode ? "#16213e" : "white", color: darkMode ? "white" : "black", padding: "32px", borderRadius: "24px", boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}>

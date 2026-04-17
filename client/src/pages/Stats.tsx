@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import API_BASE from "../config";
 
 interface Habit {
   _id: string;
@@ -12,7 +13,7 @@ function Stats({ darkMode }: { darkMode: boolean }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    axios.get("http://localhost:3001/api/habits", {
+    axios.get(`${API_BASE}/api/habits`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then((res) => setHabits(res.data));
   }, []);
@@ -43,7 +44,6 @@ function Stats({ darkMode }: { darkMode: boolean }) {
         ))}
       </div>
 
-      {/* Task Breakdown */}
       <div style={card}>
         <h2 style={{ marginBottom: "15px" }}>Study Task Breakdown</h2>
         {habits.length === 0 ? (
@@ -62,7 +62,6 @@ function Stats({ darkMode }: { darkMode: boolean }) {
         )}
       </div>
 
-      {/* Progress Bar */}
       <div style={card}>
         <h2 style={{ marginBottom: "15px" }}>Today's Study Goal</h2>
         <div style={{ background: darkMode ? "#0f3460" : "#f3f3f3", borderRadius: "999px", height: "20px", marginBottom: "10px" }}>
@@ -71,7 +70,6 @@ function Stats({ darkMode }: { darkMode: boolean }) {
         <p style={{ color: "#9ca3af", textAlign: "center" }}>{completedHabits} of {totalHabits} study tasks completed</p>
       </div>
 
-      {/* Motivational Banner */}
       <div style={{ background: "linear-gradient(to right, #f9a8d4, #fdba74)", color: "#9d174d", fontWeight: "bold", fontSize: "18px", textAlign: "center", padding: "32px", borderRadius: "24px" }}>
         {completionRate === 100 ? "🎉 You've completed all your tasks!" : completionRate >= 50 ? `Yay! You're ${completionRate}% through your study goals!` : `Keep going! You've got — ${completionRate}% done so far!`}
       </div>
