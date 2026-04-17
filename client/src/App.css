@@ -1,11 +1,23 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
 .card {
   background: white;
   padding: 32px;
   border-radius: 24px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
-body {
-  margin: 0;
-  background: #fdf2f8;
-  font-family: sans-serif;
+
+.card-dark {
+  background: #16213e;
+  padding: 32px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  color: white;
+}
+
+.page {
+  padding: 40px;
 }
