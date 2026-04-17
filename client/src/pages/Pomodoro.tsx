@@ -1,38 +1,50 @@
 import { useState, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
-import ringSound from "../assets/ringer.mp3";
+import ringSound from "../assets/ringercut.mp3";
 
 type Mode = "focus" | "short" | "long";
 
 const LABELS = {
-  focus: "FOCUS SESSION",
-  short: "SHORT BREAK",
-  long: "LONG BREAK",
+  focus: "Focus Session",
+  short: "Short Break",
+  long: "Long Break",
 };
 
-const RADIUS = 95;
+const RADIUS = 96;
 const CIRC = 2 * Math.PI * RADIUS;
 
-function formatTime(totalSeconds: number) {
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = totalSeconds % 60;
-  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+function formatTime(total: number) {
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-function toSeconds(mins: number, secs: number) {
-  return mins * 60 + secs;
+function toSeconds(min: number, sec: number) {
+  return min * 60 + sec;
 }
 
 export default function Pomodoro() {
   /* SETTINGS */
-  const [focusMin, setFocusMin] = useState(() => Number(localStorage.getItem("focusMin")) || 25);
-  const [focusSec, setFocusSec] = useState(() => Number(localStorage.getItem("focusSec")) || 0);
+  const [focusMin, setFocusMin] = useState(
+    () => Number(localStorage.getItem("focusMin")) || 25
+  );
+  const [focusSec, setFocusSec] = useState(
+    () => Number(localStorage.getItem("focusSec")) || 0
+  );
 
-  const [shortMin, setShortMin] = useState(() => Number(localStorage.getItem("shortMin")) || 5);
-  const [shortSec, setShortSec] = useState(() => Number(localStorage.getItem("shortSec")) || 0);
+  const [shortMin, setShortMin] = useState(
+    () => Number(localStorage.getItem("shortMin")) || 5
+  );
+  const [shortSec, setShortSec] = useState(
+    () => Number(localStorage.getItem("shortSec")) || 0
+  );
 
-  const [longMin, setLongMin] = useState(() => Number(localStorage.getItem("longMin")) || 15);
-  const [longSec, setLongSec] = useState(() => Number(localStorage.getItem("longSec")) || 0);
+  const [longMin, setLongMin] = useState(
+    () => Number(localStorage.getItem("longMin")) || 15
+  );
+  const [longSec, setLongSec] = useState(
+    () => Number(localStorage.getItem("longSec")) || 0
+  );
 
   const [sessionsGoal, setSessionsGoal] = useState(
     () => Number(localStorage.getItem("sessionsGoal")) || 4
@@ -54,6 +66,7 @@ export default function Pomodoro() {
   const [running, setRunning] = useState(false);
   const [completed, setCompleted] = useState(0);
 
+  /* UX */
   const [autoStart, setAutoStart] = useState(true);
   const [soundOn, setSoundOn] = useState(true);
 
@@ -97,19 +110,22 @@ export default function Pomodoro() {
     setRemaining(MODES[next]);
   }
 
+  async function playSound() {
+    if (!soundOn || !audioRef.current) return;
+    try {
+      audioRef.current.currentTime = 0;
+      await audioRef.current.play();
+    } catch {}
+  }
+
   async function nextMode() {
-    if (soundOn && audioRef.current) {
-      try {
-        audioRef.current.currentTime = 0;
-        await audioRef.current.play();
-      } catch {}
-    }
+    await playSound();
 
     if (mode === "focus") {
-      const nextCompleted = completed + 1;
-      setCompleted(nextCompleted);
+      const next = completed + 1;
+      setCompleted(next);
 
-      if (nextCompleted >= sessionsGoal) {
+      if (next >= sessionsGoal) {
         confetti({
           particleCount: 180,
           spread: 100,
@@ -117,9 +133,9 @@ export default function Pomodoro() {
         });
       }
 
-      const next = nextCompleted % sessionsGoal === 0 ? "long" : "short";
-      setMode(next);
-      setRemaining(MODES[next]);
+      const target = next % sessionsGoal === 0 ? "long" : "short";
+      setMode(target);
+      setRemaining(MODES[target]);
       if (autoStart) setRunning(true);
     } else {
       setMode("focus");
@@ -149,49 +165,42 @@ export default function Pomodoro() {
     };
   }, [running, mode, completed]);
 
-  /* Update remaining when settings change */
+  /* update current timer if values change */
   useEffect(() => {
     if (!running) setRemaining(MODES[mode]);
-  }, [
-    focusMin,
-    focusSec,
-    shortMin,
-    shortSec,
-    longMin,
-    longSec,
-  ]);
+  }, [focusMin, focusSec, shortMin, shortSec, longMin, longSec]);
 
   const progress = CIRC * (1 - remaining / total);
 
   const glass = {
     background: "var(--card)",
     border: "1px solid rgba(255,255,255,0.08)",
-    boxShadow: "0 18px 50px rgba(0,0,0,0.18)",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
     backdropFilter: "blur(18px)",
   };
 
-  const smallBtn = {
+  const iconBtn = {
     width: 54,
     height: 54,
     borderRadius: "50%",
     border: "none",
     cursor: "pointer",
-    color: "var(--text)",
     fontSize: 22,
+    color: "var(--text)",
     ...glass,
   };
 
   const inputStyle = {
-    width: "44px",
-    textAlign: "center" as const,
+    width: 42,
     border: "none",
     outline: "none",
-    borderRadius: "10px",
-    background: "var(--bg)",
-    color: "var(--text)",
+    textAlign: "center" as const,
+    borderRadius: 10,
     padding: "6px",
     fontWeight: 700,
-    fontSize: "16px",
+    fontSize: 16,
+    background: "var(--bg)",
+    color: "var(--text)",
   };
 
   return (
@@ -199,8 +208,8 @@ export default function Pomodoro() {
       style={{
         minHeight: "100vh",
         background: `
-          radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 30%),
-          radial-gradient(circle at bottom right, rgba(255,255,255,0.06), transparent 30%),
+          radial-gradient(circle at top left, rgba(255,255,255,0.10), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(255,255,255,0.08), transparent 28%),
           var(--bg)
         `,
         display: "flex",
@@ -214,7 +223,7 @@ export default function Pomodoro() {
           width: "100%",
           maxWidth: 560,
           padding: 34,
-          borderRadius: 32,
+          borderRadius: 34,
           ...glass,
         }}
       >
@@ -234,14 +243,17 @@ export default function Pomodoro() {
               style={{
                 padding: "10px 18px",
                 borderRadius: 999,
-                border: "none",
                 cursor: "pointer",
                 fontWeight: 700,
+                border:
+                  mode === m
+                    ? "none"
+                    : "1px solid rgba(0,0,0,0.08)",
                 background:
                   mode === m
                     ? "linear-gradient(135deg,var(--accent1),var(--accent2))"
-                    : "rgba(255,255,255,0.05)",
-                color: mode === m ? "white" : "var(--text2)",
+                    : "var(--bg)",
+                color: mode === m ? "white" : "var(--text)",
               }}
             >
               {m === "focus"
@@ -253,8 +265,14 @@ export default function Pomodoro() {
           ))}
         </div>
 
-        {/* Timer Circle */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
+        {/* Timer */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 28,
+          }}
+        >
           <div style={{ position: "relative", width: 250, height: 250 }}>
             <svg
               width="250"
@@ -302,11 +320,23 @@ export default function Pomodoro() {
                 alignItems: "center",
               }}
             >
-              <div style={{ fontSize: 56, fontWeight: 800, color: "var(--text)" }}>
+              <div
+                style={{
+                  fontSize: 56,
+                  fontWeight: 800,
+                  color: "var(--text)",
+                }}
+              >
                 {formatTime(remaining)}
               </div>
 
-              <div style={{ fontSize: 13, color: "var(--text2)", marginTop: 8 }}>
+              <div
+                style={{
+                  marginTop: 8,
+                  fontSize: 13,
+                  color: "var(--text2)",
+                }}
+              >
                 {LABELS[mode]}
               </div>
             </div>
@@ -319,11 +349,11 @@ export default function Pomodoro() {
             display: "flex",
             justifyContent: "center",
             gap: 16,
-            marginBottom: 28,
+            marginBottom: 24,
           }}
         >
           <button
-            style={smallBtn}
+            style={iconBtn}
             onClick={() => {
               setRunning(false);
               setRemaining(total);
@@ -335,21 +365,24 @@ export default function Pomodoro() {
           <button
             onClick={() => setRunning((r) => !r)}
             style={{
-              padding: "14px 48px",
+              padding: "14px 50px",
+              minWidth: 150,
               borderRadius: 999,
               border: "none",
               cursor: "pointer",
-              fontSize: 18,
               fontWeight: 700,
+              fontSize: 18,
+              color: "white",
               background:
                 "linear-gradient(135deg,var(--accent1),var(--accent2))",
-              color: "var(--buttonText)",
+              boxShadow:
+                "0 12px 30px rgba(244,114,182,0.25)",
             }}
           >
-            {running ? "Pause" : "Play"}
+            {running ? "⏸ Pause" : "▶ Start"}
           </button>
 
-          <button style={smallBtn} onClick={nextMode}>
+          <button style={iconBtn} onClick={nextMode}>
             ⏭
           </button>
         </div>
@@ -360,8 +393,8 @@ export default function Pomodoro() {
             display: "flex",
             justifyContent: "center",
             gap: 10,
-            marginBottom: 24,
             flexWrap: "wrap",
+            marginBottom: 24,
           }}
         >
           <button
@@ -371,8 +404,8 @@ export default function Pomodoro() {
               borderRadius: 999,
               border: "none",
               cursor: "pointer",
-              ...glass,
               color: "var(--text)",
+              ...glass,
             }}
           >
             {autoStart ? "⚡ Auto Start On" : "Auto Start Off"}
@@ -385,8 +418,8 @@ export default function Pomodoro() {
               borderRadius: 999,
               border: "none",
               cursor: "pointer",
-              ...glass,
               color: "var(--text)",
+              ...glass,
             }}
           >
             {soundOn ? "🔔 Sound On" : "🔕 Sound Off"}
@@ -415,7 +448,13 @@ export default function Pomodoro() {
                 ...glass,
               }}
             >
-              <div style={{ fontSize: 12, color: "var(--text2)" }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--text2)",
+                  marginBottom: 8,
+                }}
+              >
                 {label}
               </div>
 
@@ -424,14 +463,15 @@ export default function Pomodoro() {
                   display: "flex",
                   justifyContent: "center",
                   gap: 6,
-                  marginTop: 8,
                 }}
               >
                 <input
                   type="number"
                   min="0"
                   value={mins}
-                  onChange={(e) => setMin(Number(e.target.value))}
+                  onChange={(e) =>
+                    setMin(Number(e.target.value))
+                  }
                   style={inputStyle}
                 />
 
@@ -440,12 +480,22 @@ export default function Pomodoro() {
                   min="0"
                   max="59"
                   value={secs}
-                  onChange={(e) => setSec(Math.min(59, Number(e.target.value)))}
+                  onChange={(e) =>
+                    setSec(
+                      Math.min(59, Number(e.target.value))
+                    )
+                  }
                   style={inputStyle}
                 />
               </div>
 
-              <div style={{ fontSize: 11, color: "var(--text2)", marginTop: 6 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--text2)",
+                  marginTop: 6,
+                }}
+              >
                 min / sec
               </div>
             </div>
@@ -460,21 +510,36 @@ export default function Pomodoro() {
               ...glass,
             }}
           >
-            <div style={{ fontSize: 12, color: "var(--text2)" }}>Goal</div>
+            <div
+              style={{
+                fontSize: 12,
+                color: "var(--text2)",
+                marginBottom: 8,
+              }}
+            >
+              Goal
+            </div>
 
             <input
               type="number"
               min="1"
               value={sessionsGoal}
-              onChange={(e) => setSessionsGoal(Number(e.target.value))}
+              onChange={(e) =>
+                setSessionsGoal(Number(e.target.value))
+              }
               style={{
                 ...inputStyle,
-                width: "70px",
-                marginTop: "8px",
+                width: 70,
               }}
             />
 
-            <div style={{ fontSize: 11, color: "var(--text2)", marginTop: 6 }}>
+            <div
+              style={{
+                fontSize: 11,
+                color: "var(--text2)",
+                marginTop: 6,
+              }}
+            >
               sessions
             </div>
           </div>
