@@ -3,7 +3,11 @@ import axios from "axios";
 
 const API = import.meta.env.VITE_API_URL;
 
-function Signup() {
+interface SignupProps {
+  darkMode: boolean;
+}
+
+function Signup({ darkMode }: SignupProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,6 +37,8 @@ function Signup() {
     fontSize: "16px",
     marginBottom: "12px",
     boxSizing: "border-box" as const,
+    background: darkMode ? "#1f2937" : "white",
+    color: darkMode ? "white" : "black",
   };
 
   const btnStyle = {
@@ -49,8 +55,8 @@ function Signup() {
   };
 
   const googleBtnStyle = {
-    background: "white",
-    color: "#374151",
+    background: darkMode ? "#111827" : "white",
+    color: darkMode ? "white" : "#374151",
     border: "2px solid #e5e7eb",
     borderRadius: "20px",
     padding: "12px",
@@ -72,11 +78,18 @@ function Signup() {
     >
       <div
         style={{
-          background: "white",
+          background: darkMode
+            ? "rgba(31,41,55,0.95)"
+            : "white",
+          color: darkMode ? "white" : "black",
           padding: "40px",
           borderRadius: "20px",
           width: "380px",
-          boxShadow: "0 4px 24px rgba(244,114,182,0.15)",
+          boxShadow: darkMode
+            ? "0 4px 24px rgba(244,114,182,0.25)"
+            : "0 4px 24px rgba(244,114,182,0.15)",
+          border: darkMode ? "1px solid #f472b6" : "none",
+          transition: "all 0.3s ease",
         }}
       >
         <h2 style={{ textAlign: "center", marginBottom: "24px" }}>
@@ -86,7 +99,7 @@ function Signup() {
         {error && (
           <p
             style={{
-              color: "red",
+              color: "#ef4444",
               textAlign: "center",
               marginBottom: "12px",
             }}
@@ -126,7 +139,7 @@ function Signup() {
           style={{
             textAlign: "center",
             margin: "16px 0",
-            color: "#9ca3af",
+            color: darkMode ? "#d1d5db" : "#9ca3af",
           }}
         >
           or
@@ -142,7 +155,7 @@ function Signup() {
           style={{
             textAlign: "center",
             marginTop: "20px",
-            color: "#9ca3af",
+            color: darkMode ? "#d1d5db" : "#9ca3af",
           }}
         >
           Already have an account?{" "}
