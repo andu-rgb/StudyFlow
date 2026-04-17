@@ -15,6 +15,7 @@ function Navbar({ darkMode, setDarkMode }: { darkMode: boolean, setDarkMode: (v:
         <Link to="/" style={{ color: "white", textDecoration: "none", fontWeight: "bold" }}>Home</Link>
         <Link to="/dashboard" style={{ color: "white", textDecoration: "none", fontWeight: "bold" }}>Dashboard</Link>
         <Link to="/stats" style={{ color: "white", textDecoration: "none", fontWeight: "bold" }}>Stats</Link>
+        <Link to="/pomodoro">Timer</Link>
       </div>
       <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
         <button

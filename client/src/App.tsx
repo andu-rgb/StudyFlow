@@ -8,6 +8,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AuthSuccess from "./pages/AuthSuccess";
 import type { ReactElement } from "react";
+import Pomodoro from "./pages/Pomodoro";
+
 
 function ProtectedRoute({ children }: { children: ReactElement }) {
   const token = localStorage.getItem("token");
@@ -24,10 +26,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Home darkMode={darkMode} />} />
           <Route path="/login" element={<Login darkMode={darkMode} />} />
-<Route path="/signup" element={<Signup darkMode={darkMode} />} />
+          <Route path="/signup" element={<Signup darkMode={darkMode} />} />
           <Route path="/auth-success" element={<AuthSuccess />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard darkMode={darkMode} /></ProtectedRoute>} />
           <Route path="/stats" element={<ProtectedRoute><Stats darkMode={darkMode} /></ProtectedRoute>} />
+          <Route path="/pomodoro" element={<ProtectedRoute><Pomodoro darkMode={darkMode} /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </div>
