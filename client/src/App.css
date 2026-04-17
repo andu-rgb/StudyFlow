@@ -1,64 +1,96 @@
+/* ===============================
+   STUDYFLOW PREMIUM THEME SYSTEM
+   Apple-clean + cute + readable
+================================= */
+
 body {
   margin: 0;
-  font-family: sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
-  transition: all 0.3s ease;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
-/* DEFAULT */
+/* Default */
 :root {
   --bg: #fff7fb;
-  --card: white;
-  --text: #111;
-  --text2: #666;
-  --accent1: #f472b6;
-  --accent2: #fb923c;
-  --buttonText: white;
+  --card: #ffffff;
+  --text: #111111;
+  --text2: #6b7280;
+
+  --accent1: #ec4899;
+  --accent2: #f97316;
+
+  --buttonText: #ffffff;
 }
 
-/* 🌸 Pink Light */
+/* ===================================
+   🌸 PINK LIGHT
+=================================== */
 [data-theme="pink-light"] {
-  --bg: #fff7fb;
-  --card: white;
-  --text: #111;
-  --text2: #666;
-  --accent1: #f472b6;
-  --accent2: #fb923c;
-  --buttonText: white;
+  --bg: #fdf2f8;
+  --card: #ffffff;
+  --text: #111111;
+  --text2: #6b7280;
+
+  --accent1: #ec4899; /* pink */
+  --accent2: #f97316; /* orange */
+
+  --buttonText: #ffffff;
 }
 
-/* 🌙 Pink Dark */
+/* ===================================
+   🌙 PINK DARK
+=================================== */
 [data-theme="pink-dark"] {
-  --bg: #111827;
-  --card: #1f2937;
-  --text: white;
-  --text2: #cbd5e1;
+  --bg: #14060f;
+  --card: #24101d;
+  --text: #ffffff;
+  --text2: #d1d5db;
+
   --accent1: #f472b6;
   --accent2: #fb923c;
-  --buttonText: white;
+
+  --buttonText: #ffffff;
 }
 
-/* 💜 Purple Light */
+/* ===================================
+   💜 PURPLE LIGHT
+=================================== */
 [data-theme="purple-light"] {
   --bg: #f5f3ff;
-  --card: white;
-  --text: #111;
-  --text2: #666;
+  --card: #ffffff;
+  --text: #111111;
+  --text2: #6b7280;
+
   --accent1: #8b5cf6;
   --accent2: #ec4899;
-  --buttonText: white;
+
+  --buttonText: #ffffff;
 }
 
-/* 🌌 Purple Dark */
+/* ===================================
+   🌌 PURPLE DARK
+=================================== */
 [data-theme="purple-dark"] {
-  --bg: #140821;
-  --card: #211038;
-  --text: white;
+  --bg: #0f0820;
+  --card: #1d1233;
+  --text: #ffffff;
   --text2: #c4b5fd;
+
   --accent1: #8b5cf6;
   --accent2: #ec4899;
-  --buttonText: white;
+
+  --buttonText: #ffffff;
+}
+
+/* ===================================
+   GLOBAL COMPONENTS
+=================================== */
+
+.page {
+  padding: 40px;
 }
 
 .card {
@@ -66,9 +98,25 @@ body {
   color: var(--text);
   padding: 32px;
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
 }
 
-.page {
-  padding: 40px;
+.card:hover {
+  transform: translateY(-2px);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Nice Inputs */
+input {
+  font-family: inherit;
+}
+
+/* Selection */
+::selection {
+  background: var(--accent1);
+  color: white;
 }
