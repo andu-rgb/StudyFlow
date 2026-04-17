@@ -22,8 +22,7 @@ function App() {
   return (
     <div style={{ minHeight: "100vh", background: darkMode ? "#1a1a2e" : "#fdf2f8", color: darkMode ? "white" : "black", transition: "all 0.3s ease" }}>
       <BrowserRouter>
-        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
-        <Routes>
+          <Navbar />        <Routes>
           <Route path="/" element={<Home darkMode={darkMode} />} />
           <Route path="/login" element={<Login darkMode={darkMode} />} />
           <Route path="/signup" element={<Signup darkMode={darkMode} />} />
