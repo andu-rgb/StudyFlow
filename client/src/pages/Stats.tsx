@@ -33,7 +33,7 @@ function Stats({ darkMode }: { darkMode: boolean }) {
 
   return (
     <div className="page">
-      <h1 style={{ marginBottom: "30px", color: darkMode ? "white" : "black" }}>⋆☕︎ ˖ Study Progress</h1>
+      <h1 style={{ marginBottom: "30px", color: darkMode ? "white" : "black" }}>Study Progress</h1>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", marginBottom: "30px" }}>
         {[{ label: "Total Study Tasks", value: totalHabits }, { label: "Completed Today", value: completedHabits }, { label: "Completion Rate", value: `${completionRate}%` }].map((item, i) => (

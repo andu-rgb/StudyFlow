@@ -72,7 +72,7 @@ function Dashboard({ darkMode }: { darkMode: boolean }) {
         }}
       >
         <h1 style={{ color: darkMode ? "white" : "black" }}>
-          ❀˖ ° My Study Tasks
+          My Study Tasks
         </h1>
       </div>
 
@@ -108,7 +108,7 @@ function Dashboard({ darkMode }: { darkMode: boolean }) {
             fontSize: "16px",
           }}
         >
-          Add Task ✨
+          Add Task
         </button>
       </div>
 
@@ -124,9 +124,9 @@ function Dashboard({ darkMode }: { darkMode: boolean }) {
           }}
         >
           <p style={{ fontSize: "20px" }}>
-            <strong>No study tasks yet 📖</strong>
+            <strong>No study tasks yet!</strong>
           </p>
-          <p style={{ color: "#9ca3af" }}>Add your first task above!</p>
+          <p style={{ color: "#9ca3af" }}>Add your first task above</p>
         </div>
       ) : (
         habits.map((habit) => (
