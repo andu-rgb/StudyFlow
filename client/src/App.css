@@ -1,21 +1,72 @@
 body {
   margin: 0;
   font-family: sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: all 0.3s ease;
+}
+
+/* DEFAULT */
+:root {
+  --bg: #fff7fb;
+  --card: white;
+  --text: #111;
+  --text2: #666;
+  --accent1: #f472b6;
+  --accent2: #fb923c;
+  --buttonText: white;
+}
+
+/* 🌸 Pink Light */
+[data-theme="pink-light"] {
+  --bg: #fff7fb;
+  --card: white;
+  --text: #111;
+  --text2: #666;
+  --accent1: #f472b6;
+  --accent2: #fb923c;
+  --buttonText: white;
+}
+
+/* 🌙 Pink Dark */
+[data-theme="pink-dark"] {
+  --bg: #111827;
+  --card: #1f2937;
+  --text: white;
+  --text2: #cbd5e1;
+  --accent1: #f472b6;
+  --accent2: #fb923c;
+  --buttonText: white;
+}
+
+/* 💜 Purple Light */
+[data-theme="purple-light"] {
+  --bg: #f5f3ff;
+  --card: white;
+  --text: #111;
+  --text2: #666;
+  --accent1: #8b5cf6;
+  --accent2: #ec4899;
+  --buttonText: white;
+}
+
+/* 🌌 Purple Dark */
+[data-theme="purple-dark"] {
+  --bg: #140821;
+  --card: #211038;
+  --text: white;
+  --text2: #c4b5fd;
+  --accent1: #8b5cf6;
+  --accent2: #ec4899;
+  --buttonText: white;
 }
 
 .card {
-  background: white;
+  background: var(--card);
+  color: var(--text);
   padding: 32px;
   border-radius: 24px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-}
-
-.card-dark {
-  background: #16213e;
-  padding: 32px;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  color: white;
 }
 
 .page {

@@ -13,35 +13,35 @@ const LABELS = {
 const RADIUS = 95;
 const CIRC = 2 * Math.PI * RADIUS;
 
-function formatTime(s: number) {
-  const min = Math.floor(s / 60);
-  const sec = s % 60;
-  return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+function formatTime(totalSeconds: number) {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
+function toSeconds(mins: number, secs: number) {
+  return mins * 60 + secs;
 }
 
 export default function Pomodoro() {
   /* SETTINGS */
-  const [focusMins, setFocusMins] = useState(
-    () => Number(localStorage.getItem("focusMins")) || 25
-  );
-  const [shortMins, setShortMins] = useState(
-    () => Number(localStorage.getItem("shortMins")) || 5
-  );
-  const [longMins, setLongMins] = useState(
-    () => Number(localStorage.getItem("longMins")) || 15
-  );
+  const [focusMin, setFocusMin] = useState(() => Number(localStorage.getItem("focusMin")) || 25);
+  const [focusSec, setFocusSec] = useState(() => Number(localStorage.getItem("focusSec")) || 0);
+
+  const [shortMin, setShortMin] = useState(() => Number(localStorage.getItem("shortMin")) || 5);
+  const [shortSec, setShortSec] = useState(() => Number(localStorage.getItem("shortSec")) || 0);
+
+  const [longMin, setLongMin] = useState(() => Number(localStorage.getItem("longMin")) || 15);
+  const [longSec, setLongSec] = useState(() => Number(localStorage.getItem("longSec")) || 0);
+
   const [sessionsGoal, setSessionsGoal] = useState(
     () => Number(localStorage.getItem("sessionsGoal")) || 4
   );
 
   /* TIMER */
-  const [mode, setMode] = useState<Mode>("focus");
-  const [running, setRunning] = useState(false);
-  const [completed, setCompleted] = useState(0);
-
-  const focusTime = focusMins * 60;
-  const shortTime = shortMins * 60;
-  const longTime = longMins * 60;
+  const focusTime = toSeconds(focusMin, focusSec);
+  const shortTime = toSeconds(shortMin, shortSec);
+  const longTime = toSeconds(longMin, longSec);
 
   const MODES = {
     focus: focusTime,
@@ -49,9 +49,11 @@ export default function Pomodoro() {
     long: longTime,
   };
 
+  const [mode, setMode] = useState<Mode>("focus");
   const [remaining, setRemaining] = useState(focusTime);
+  const [running, setRunning] = useState(false);
+  const [completed, setCompleted] = useState(0);
 
-  /* UI */
   const [autoStart, setAutoStart] = useState(true);
   const [soundOn, setSoundOn] = useState(true);
 
@@ -67,17 +69,27 @@ export default function Pomodoro() {
     audioRef.current = audio;
   }, []);
 
-  /* SAVE SETTINGS */
+  /* SAVE */
   useEffect(() => {
-    localStorage.setItem("focusMins", String(focusMins));
-    localStorage.setItem("shortMins", String(shortMins));
-    localStorage.setItem("longMins", String(longMins));
+    localStorage.setItem("focusMin", String(focusMin));
+    localStorage.setItem("focusSec", String(focusSec));
+    localStorage.setItem("shortMin", String(shortMin));
+    localStorage.setItem("shortSec", String(shortSec));
+    localStorage.setItem("longMin", String(longMin));
+    localStorage.setItem("longSec", String(longSec));
     localStorage.setItem("sessionsGoal", String(sessionsGoal));
-  }, [focusMins, shortMins, longMins, sessionsGoal]);
+  }, [
+    focusMin,
+    focusSec,
+    shortMin,
+    shortSec,
+    longMin,
+    longSec,
+    sessionsGoal,
+  ]);
 
   const total = MODES[mode];
 
-  /* SWITCH MODE */
   function switchMode(next: Mode) {
     if (timerRef.current) clearInterval(timerRef.current);
     setRunning(false);
@@ -85,7 +97,6 @@ export default function Pomodoro() {
     setRemaining(MODES[next]);
   }
 
-  /* NEXT MODE */
   async function nextMode() {
     if (soundOn && audioRef.current) {
       try {
@@ -106,9 +117,7 @@ export default function Pomodoro() {
         });
       }
 
-      const next =
-        nextCompleted % sessionsGoal === 0 ? "long" : "short";
-
+      const next = nextCompleted % sessionsGoal === 0 ? "long" : "short";
       setMode(next);
       setRemaining(MODES[next]);
       if (autoStart) setRunning(true);
@@ -140,32 +149,24 @@ export default function Pomodoro() {
     };
   }, [running, mode, completed]);
 
-  /* KEYBOARD SHORTCUTS */
+  /* Update remaining when settings change */
   useEffect(() => {
-    function handle(e: KeyboardEvent) {
-      if (e.code === "Space") {
-        e.preventDefault();
-        setRunning((r) => !r);
-      }
-      if (e.key === "r") {
-        setRunning(false);
-        setRemaining(total);
-      }
-      if (e.key === "n") {
-        nextMode();
-      }
-    }
-
-    window.addEventListener("keydown", handle);
-    return () => window.removeEventListener("keydown", handle);
-  }, [total, mode, completed]);
+    if (!running) setRemaining(MODES[mode]);
+  }, [
+    focusMin,
+    focusSec,
+    shortMin,
+    shortSec,
+    longMin,
+    longSec,
+  ]);
 
   const progress = CIRC * (1 - remaining / total);
 
   const glass = {
     background: "var(--card)",
     border: "1px solid rgba(255,255,255,0.08)",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.22)",
+    boxShadow: "0 18px 50px rgba(0,0,0,0.18)",
     backdropFilter: "blur(18px)",
   };
 
@@ -180,13 +181,17 @@ export default function Pomodoro() {
     ...glass,
   };
 
-  const accent = {
-    background:
-      "linear-gradient(135deg,var(--accent1),var(--accent2))",
-    color: "white",
+  const inputStyle = {
+    width: "44px",
+    textAlign: "center" as const,
     border: "none",
-    cursor: "pointer",
+    outline: "none",
+    borderRadius: "10px",
+    background: "var(--bg)",
+    color: "var(--text)",
+    padding: "6px",
     fontWeight: 700,
+    fontSize: "16px",
   };
 
   return (
@@ -202,34 +207,14 @@ export default function Pomodoro() {
         justifyContent: "center",
         alignItems: "center",
         padding: "2rem",
-        position: "relative",
-        overflow: "hidden",
       }}
     >
-      {/* Floating Glow */}
-      <div
-        style={{
-          position: "absolute",
-          width: 420,
-          height: 420,
-          borderRadius: "50%",
-          background:
-            "linear-gradient(135deg,var(--accent1),var(--accent2))",
-          filter: "blur(130px)",
-          opacity: 0.14,
-          top: -120,
-          left: -100,
-        }}
-      />
-
       <div
         style={{
           width: "100%",
           maxWidth: 560,
           padding: 34,
           borderRadius: 32,
-          position: "relative",
-          zIndex: 2,
           ...glass,
         }}
       >
@@ -268,14 +253,8 @@ export default function Pomodoro() {
           ))}
         </div>
 
-        {/* Circle */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: 28,
-          }}
-        >
+        {/* Timer Circle */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
           <div style={{ position: "relative", width: 250, height: 250 }}>
             <svg
               width="250"
@@ -291,6 +270,7 @@ export default function Pomodoro() {
                 stroke="rgba(255,255,255,0.08)"
                 strokeWidth="12"
               />
+
               <circle
                 cx="125"
                 cy="125"
@@ -322,24 +302,11 @@ export default function Pomodoro() {
                 alignItems: "center",
               }}
             >
-              <div
-                style={{
-                  fontSize: 56,
-                  fontWeight: 800,
-                  color: "var(--text)",
-                }}
-              >
+              <div style={{ fontSize: 56, fontWeight: 800, color: "var(--text)" }}>
                 {formatTime(remaining)}
               </div>
 
-              <div
-                style={{
-                  marginTop: 8,
-                  fontSize: 13,
-                  color: "var(--text2)",
-                  letterSpacing: 1,
-                }}
-              >
+              <div style={{ fontSize: 13, color: "var(--text2)", marginTop: 8 }}>
                 {LABELS[mode]}
               </div>
             </div>
@@ -366,23 +333,20 @@ export default function Pomodoro() {
           </button>
 
           <button
-            onClick={() => {
-              audioRef.current?.play().then(() => {
-                audioRef.current!.pause();
-                audioRef.current!.currentTime = 0;
-              }).catch(() => {});
-              setRunning((r) => !r);
-            }}
+            onClick={() => setRunning((r) => !r)}
             style={{
               padding: "14px 48px",
               borderRadius: 999,
+              border: "none",
+              cursor: "pointer",
               fontSize: 18,
-              ...accent,
-              boxShadow:
-                "0 10px 28px rgba(244,114,182,0.25)",
+              fontWeight: 700,
+              background:
+                "linear-gradient(135deg,var(--accent1),var(--accent2))",
+              color: "var(--buttonText)",
             }}
           >
-            {running ? "Pause" : "Start"}
+            {running ? "Pause" : "Play"}
           </button>
 
           <button style={smallBtn} onClick={nextMode}>
@@ -395,7 +359,7 @@ export default function Pomodoro() {
           style={{
             display: "flex",
             justifyContent: "center",
-            gap: 12,
+            gap: 10,
             marginBottom: 24,
             flexWrap: "wrap",
           }}
@@ -429,7 +393,7 @@ export default function Pomodoro() {
           </button>
         </div>
 
-        {/* Stats */}
+        {/* Editors */}
         <div
           style={{
             display: "grid",
@@ -438,40 +402,82 @@ export default function Pomodoro() {
           }}
         >
           {[
-            ["Focus", `${focusMins}m`],
-            ["Short", `${shortMins}m`],
-            ["Long", `${longMins}m`],
-            ["Done", `${completed}/${sessionsGoal}`],
-          ].map(([label, val]) => (
+            ["Focus", focusMin, focusSec, setFocusMin, setFocusSec],
+            ["Short", shortMin, shortSec, setShortMin, setShortSec],
+            ["Long", longMin, longSec, setLongMin, setLongSec],
+          ].map(([label, mins, secs, setMin, setSec]: any) => (
             <div
               key={label}
               style={{
-                padding: 16,
+                padding: 14,
                 borderRadius: 18,
                 textAlign: "center",
                 ...glass,
               }}
             >
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "var(--text2)",
-                  marginBottom: 6,
-                }}
-              >
+              <div style={{ fontSize: 12, color: "var(--text2)" }}>
                 {label}
               </div>
+
               <div
                 style={{
-                  color: "var(--text)",
-                  fontWeight: 800,
-                  fontSize: 20,
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 6,
+                  marginTop: 8,
                 }}
               >
-                {val}
+                <input
+                  type="number"
+                  min="0"
+                  value={mins}
+                  onChange={(e) => setMin(Number(e.target.value))}
+                  style={inputStyle}
+                />
+
+                <input
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={secs}
+                  onChange={(e) => setSec(Math.min(59, Number(e.target.value)))}
+                  style={inputStyle}
+                />
+              </div>
+
+              <div style={{ fontSize: 11, color: "var(--text2)", marginTop: 6 }}>
+                min / sec
               </div>
             </div>
           ))}
+
+          {/* Goal */}
+          <div
+            style={{
+              padding: 14,
+              borderRadius: 18,
+              textAlign: "center",
+              ...glass,
+            }}
+          >
+            <div style={{ fontSize: 12, color: "var(--text2)" }}>Goal</div>
+
+            <input
+              type="number"
+              min="1"
+              value={sessionsGoal}
+              onChange={(e) => setSessionsGoal(Number(e.target.value))}
+              style={{
+                ...inputStyle,
+                width: "70px",
+                marginTop: "8px",
+              }}
+            />
+
+            <div style={{ fontSize: 11, color: "var(--text2)", marginTop: 6 }}>
+              sessions
+            </div>
+          </div>
         </div>
       </div>
     </div>
