@@ -362,8 +362,8 @@ function Dashboard() {
                     color: "white",
                     background:
                       habit.completed
-                        ? "#9ca3af"
-                        : "linear-gradient(to right,#22c55e,#16a34a)",
+                        ? "#b8b8c5"
+                         : "linear-gradient(to right,#d8b4fe,#f9a8d4)",
                   }}
                 >
                   {habit.completed
