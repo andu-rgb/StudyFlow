@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+const API = import.meta.env.VITE_API_URL;
 
 function Signup() {
   const [name, setName] = useState("");
@@ -9,7 +10,7 @@ function Signup() {
 
   async function handleSignup() {
     try {
-      const res = await axios.post("http://localhost:3001/api/auth/register", { name, email, password });
+      const res = await axios.post(`${API}/api/auth/register`, { name, email, password });
       localStorage.setItem("token", res.data.token);
       window.location.href = "/dashboard";
     } catch (err: any) {
@@ -35,7 +36,7 @@ function Signup() {
 
         <div style={{ textAlign: "center", margin: "16px 0", color: "#9ca3af" }}>or</div>
 
-        <a href="http://localhost:3001/auth/google">
+        <a href={`${API}/auth/google`}>
           <button style={{ background: "white", color: "#374151", border: "2px solid #e5e7eb", borderRadius: "20px", padding: "12px", cursor: "pointer", fontWeight: "bold", fontSize: "16px", width: "100%" }}>
             🔵 Continue with Google
           </button>

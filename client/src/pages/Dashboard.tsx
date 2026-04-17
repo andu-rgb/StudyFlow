@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import confetti from "canvas-confetti";
 
-const API = "http://localhost:3001/api/habits";
+const API = `${import.meta.env.VITE_API_URL}/api/habits`;
 
 interface Habit {
   _id: string;
