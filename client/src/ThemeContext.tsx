@@ -23,7 +23,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.setAttribute('data-theme', t)
   }
 
-  const toggleDark = () => setTheme(pairs[theme])
+  const toggleDark = () => setThemeState(prev => {
+    const next = pairs[prev]
+    localStorage.setItem('sf-theme', next)
+    document.documentElement.setAttribute('data-theme', next)
+    return next
+  })
 
   useEffect(() => {
     const saved = localStorage.getItem('sf-theme') as Theme
