@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import ringSound from "../assets/ring.mp3";
+import ringSound from "../assets/ringer.mp3";
 
 type Mode = "focus" | "short" | "long";
 const LABELS = { focus: "Focus Session", short: "Short Break", long: "Long Break" };
